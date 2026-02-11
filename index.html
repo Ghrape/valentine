@@ -34,17 +34,17 @@ canvas {
 
 h1 {
   font-size: 65px;           /* larger text */
-  margin: 0 20px 40px;       /* spacing below for buttons */
+  margin: 0 20px 60px;       /* space below for buttons */
 }
 
 button {
   padding: 20px 50px;        /* bigger buttons */
   font-size: 26px;           /* bigger text */
-  margin: 25px 0;            /* larger vertical spacing between buttons */
   border-radius: 12px;
   border: none;
   cursor: pointer;
   transition: transform 0.2s;
+  display: block;            /* force buttons to stack vertically */
 }
 
 button:hover {
@@ -54,12 +54,13 @@ button:hover {
 #yesBtn {
   background: red;
   color: white;
+  margin-bottom: 40px;       /* space between YES and NO */
 }
 
 #noBtn {
   background: black;
   color: white;
-  position: absolute;
+  position: relative;        /* allow NO to stay under YES */
 }
 
 .heart {
@@ -201,7 +202,7 @@ yesBtn.addEventListener("click", function() {
   // Replace only the content div, keeping <audio> and canvas
   const contentDiv = document.querySelector('.content');
   contentDiv.innerHTML = `
-    <h1 style="margin-bottom: 30px;">❤️ GREAT CHOICE!! ❤️</h1>
+    <h1 style="margin-bottom: 50px;">❤️ GREAT CHOICE!! ❤️</h1>
     <h2>You just made my year ❤️</h2>
   `;
 
