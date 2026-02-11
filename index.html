@@ -23,17 +23,24 @@ canvas {
 .content {
   position: relative;
   z-index: 1;
+  width: 100%;
+  height: 100vh;            /* fill viewport */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* vertical centering */
+  align-items: center;       /* horizontal centering */
+  text-align: center;
 }
 
 h1 {
-  margin-top: 120px;
-  font-size: 45px;
+  font-size: 65px;           /* larger text */
+  margin: 0 20px 40px;       /* spacing below for buttons */
 }
 
 button {
-  padding: 15px 35px;
-  font-size: 22px;
-  margin: 20px;
+  padding: 20px 50px;        /* bigger buttons */
+  font-size: 26px;           /* bigger text */
+  margin: 15px;
   border-radius: 12px;
   border: none;
   cursor: pointer;
@@ -194,7 +201,8 @@ yesBtn.addEventListener("click", function() {
   // Replace only the content div, keeping <audio> and canvas
   const contentDiv = document.querySelector('.content');
   contentDiv.innerHTML = `
-    <h1 style="margin-top:150px;">❤️ GREAT CHOICE!! ❤️</h1>
+    <h1 style="margin-bottom: 30px;">❤️ GREAT CHOICE!! ❤️</h1>
+    <button style="display: none;"></button>
     <h2>You just made my year ❤️</h2>
   `;
 
