@@ -1,38 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Will You Be My Valentine?</title>
+<title>Will You Be My Valentine? ❤️</title>
+
 <style>
 body {
+  margin: 0;
   text-align: center;
-  background: pink;
-  font-family: Arial;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom right, #ff9ecf, #ff4f81);
   overflow: hidden;
+  color: white;
 }
 
 h1 {
-  margin-top: 100px;
-  font-size: 40px;
+  margin-top: 120px;
+  font-size: 45px;
 }
 
 button {
-  padding: 15px 30px;
-  font-size: 20px;
+  padding: 15px 35px;
+  font-size: 22px;
   margin: 20px;
-  cursor: pointer;
-  border-radius: 10px;
+  border-radius: 12px;
   border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+button:hover {
+  transform: scale(1.1);
 }
 
 #yesBtn {
-  background-color: red;
+  background: red;
   color: white;
 }
 
 #noBtn {
-  background-color: black;
+  background: black;
   color: white;
   position: absolute;
+}
+
+.heart {
+  position: absolute;
+  color: pink;
+  font-size: 20px;
+  animation: floatUp 6s linear infinite;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(100vh); opacity: 1; }
+  100% { transform: translateY(-10vh); opacity: 0; }
 }
 </style>
 </head>
@@ -44,41 +64,70 @@ button {
 <button id="yesBtn">YES ❤️</button>
 <button id="noBtn">No 💔</button>
 
-<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"></audio>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
 const music = document.getElementById("music");
 
-yesBtn.addEventListener("click", function() {
-  document.body.innerHTML = "<h1>🎉 SHE SAID YES!!! 🎉</h1><h2>Best Valentine Ever ❤️</h2>";
-  music.play();
-  startConfetti();
-  fetch("https://formspree.io/f/YOUR_FORM_ID", {
-    method: "POST",
-    body: JSON.stringify({ answer: "YES" }),
-    headers: { "Content-Type": "application/json" }
-  });
-});
-
+// Move No button when hovered
 noBtn.addEventListener("mouseover", function() {
-  noBtn.style.left = Math.random() * window.innerWidth + "px";
-  noBtn.style.top = Math.random() * window.innerHeight + "px";
+  noBtn.style.left = Math.random() * (window.innerWidth - 100) + "px";
+  noBtn.style.top = Math.random() * (window.innerHeight - 50) + "px";
 });
 
-function startConfetti() {
-  for(let i=0;i<100;i++){
-    let conf = document.createElement("div");
-    conf.style.width="10px";
-    conf.style.height="10px";
-    conf.style.background="white";
-    conf.style.position="absolute";
-    conf.style.left=Math.random()*window.innerWidth+"px";
-    conf.style.top=Math.random()*window.innerHeight+"px";
-    document.body.appendChild(conf);
-  }
+// Floating hearts
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.classList.add("heart");
+  heart.innerHTML = "💖";
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.fontSize = (Math.random() * 20 + 15) + "px";
+  heart.style.animationDuration = (Math.random() * 3 + 3) + "s";
+  document.body.appendChild(heart);
+
+  setTimeout(() => {
+    heart.remove();
+  }, 6000);
 }
+
+setInterval(createHeart, 500);
+
+// YES button celebration
+yesBtn.addEventListener("click", function() {
+
+  document.body.innerHTML = `
+    <h1>🎉 SHE SAID YES!!! 🎉</h1>
+    <h2>You just made my year ❤️</h2>
+  `;
+
+  music.play();
+
+  var duration = 3 * 1000;
+  var end = Date.now() + duration;
+
+  (function frame() {
+    confetti({
+      particleCount: 5,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0 }
+    });
+    confetti({
+      particleCount: 5,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1 }
+    });
+
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  }());
+});
 </script>
 
 </body>
