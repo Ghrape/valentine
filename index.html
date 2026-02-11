@@ -1,17 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Will You Be My Valentine?</title>
+
+<style>
+body {
+  margin: 0;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at bottom, #B98AF2, #000);
+  overflow: hidden;
+  color: white;
+}
+
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  margin-top: 120px;
+  font-size: 45px;
+}
+
+button {
+  padding: 15px 35px;
+  font-size: 22px;
+  margin: 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+button:hover {
+  transform: scale(1.1);
+}
+
+#yesBtn {
+  background: red;
+  color: white;
+}
+
+#noBtn {
+  background: black;
+  color: white;
+  position: absolute;
+}
+
+.heart {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<div class="content">
+  <h1>Josie, Will You Be My Valentine? ❤️</h1>
+  <button id="yesBtn">YES ❤️</button>
+  <button id="noBtn">No 💔</button>
+</div>
+
+<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" loop></audio>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+// ---------------- FIREWORKS BACKGROUND ----------------
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+
+function createFirework() {
+  const x = Math.random() * canvas.width;
+  const y = Math.random() * canvas.height / 2;
+  const color = `hsl(${Math.random()*360}, 100%, 60%)`;
+
+  for (let i = 0; i < 50; i++) {
+    particles.push({
+      x: x,
+      y: y,
+      radius: 2,
+      color: color,
+      speedX: (Math.random() - 0.5) * 6,
+      speedY: (Math.random() - 0.5) * 6,
+      life: 100
+    });
+  }
+}
+
+function updateFireworks() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach((p, index) => {
+    p.x += p.speedX;
+    p.y += p.speedY;
+    p.life--;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+
+    if (p.life <= 0) particles.splice(index, 1);
+  });
+
+  requestAnimationFrame(updateFireworks);
+}
+
+setInterval(createFirework, 800);
+updateFireworks();
+
+// ---------------- WAVY FLOATING HEARTS ----------------
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.classList.add("heart");
+
+  const heartTypes = ["💖","❤️","💘","💝","💕"];
+  heart.innerHTML = heartTypes[Math.floor(Math.random()*heartTypes.length)];
+
+  heart.style.left = Math.random() * window.innerWidth + "px";
+  heart.style.fontSize = (Math.random() * 30 + 20) + "px";
+  heart.style.color = ["#ff4f81","#ff9ecf","#ffe6f0","#ffccd5"][Math.floor(Math.random()*4)];
+  heart.style.opacity = Math.random() * 0.8 + 0.2;
+  heart.style.position = "absolute";
+  heart.style.zIndex = 0;
+  heart.style.pointerEvents = "none";
+
+  document.body.appendChild(heart);
+
+  let posY = window.innerHeight + 50;
+  let amplitude = Math.random() * 50 + 20;
+  let frequency = Math.random() * 0.02 + 0.01;
+  let startX = parseFloat(heart.style.left);
+
+  function float() {
+    posY -= 1;
+    let offsetX = Math.sin(posY * frequency) * amplitude;
+    heart.style.top = posY + "px";
+    heart.style.left = startX + offsetX + "px";
+
+    if (posY > -50) {
+      requestAnimationFrame(float);
+    } else {
+      heart.remove();
+    }
+  }
+
+  float();
+}
+
+setInterval(createHeart, 300);
+
+// ---------------- BUTTONS AND MUSIC ----------------
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const music = document.getElementById("music");
+
+// Autoplay workaround: music starts on first click anywhere
+let musicStarted = false;
+document.body.addEventListener("click", function() {
+  if (!musicStarted) {
+    music.play().catch(() => {});
+    musicStarted = true;
+  }
+}, {once:true});
+
+// No button runs away
+noBtn.addEventListener("mouseover", function() {
+  noBtn.style.left = Math.random() * (window.innerWidth - 100) + "px";
+  noBtn.style.top = Math.random() * (window.innerHeight - 50) + "px";
+});
+
+// YES button click
 yesBtn.addEventListener("click", function() {
 
-  // Show celebration content
   document.body.innerHTML = `
     <h1 style="margin-top:150px;">🎆 SHE SAID YES!!! 🎆</h1>
     <h2>You just made my year ❤️</h2>
   `;
 
-  // Play music
-  music.play().catch(() => {}); // triggers if allowed
+  music.play().catch(() => {}); // play music
 
   // Confetti explosion
-  var duration = 3 * 1000;
-  var end = Date.now() + duration;
+  const duration = 3 * 1000;
+  const end = Date.now() + duration;
 
   (function frame() {
     confetti({
@@ -32,9 +221,8 @@ yesBtn.addEventListener("click", function() {
     }
   }());
 
-  // Start music again if not playing
-  if (music.paused) {
-    music.play().catch(() => {});
-  }
-
 });
+</script>
+
+</body>
+</html>
