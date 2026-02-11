@@ -134,33 +134,38 @@ function updateFireworks() {
 setInterval(createFirework, 800);
 updateFireworks();
 
-// Background floating hearts
+// Wavy floating hearts
 function createHeart() {
   const heart = document.createElement("div");
   heart.classList.add("heart");
 
-  // Random heart style
+  // Random heart type
   const heartTypes = ["💖","❤️","💘","💝","💕"];
   heart.innerHTML = heartTypes[Math.floor(Math.random()*heartTypes.length)];
 
   heart.style.left = Math.random() * window.innerWidth + "px";
-  heart.style.fontSize = (Math.random() * 30 + 20) + "px"; // bigger range
+  heart.style.fontSize = (Math.random() * 30 + 20) + "px";
   heart.style.color = ["#ff4f81","#ff9ecf","#ffe6f0","#ffccd5"][Math.floor(Math.random()*4)];
   heart.style.opacity = Math.random() * 0.8 + 0.2;
-  heart.style.animationDuration = (Math.random() * 4 + 4) + "s";
   heart.style.position = "absolute";
   heart.style.zIndex = 0;
+  heart.style.pointerEvents = "none"; // allows clicking buttons
 
   document.body.appendChild(heart);
 
-  // Animate upward
-  let pos = window.innerHeight;
-  const speed = Math.random() * 1.5 + 0.5;
+  // Initial position
+  let posY = window.innerHeight + 50;
+  let amplitude = Math.random() * 50 + 20; // wave size
+  let frequency = Math.random() * 0.02 + 0.01; // wave speed
+  let startX = parseFloat(heart.style.left);
 
   function float() {
-    pos -= speed;
-    heart.style.top = pos + "px";
-    if (pos > -50) {
+    posY -= 1; // vertical speed
+    let offsetX = Math.sin(posY * frequency) * amplitude;
+    heart.style.top = posY + "px";
+    heart.style.left = startX + offsetX + "px";
+
+    if (posY > -50) {
       requestAnimationFrame(float);
     } else {
       heart.remove();
@@ -169,6 +174,10 @@ function createHeart() {
 
   float();
 }
+
+// Create new heart every 300ms
+setInterval(createHeart, 300);
+
 
 // Create new heart every 300ms
 setInterval(createHeart, 300);
@@ -189,7 +198,17 @@ yesBtn.addEventListener("click", function() {
     <h1 style="margin-top:200px;">❤️ GREAT CHOICE! ❤️</h1>
   `;
 
-  music.play();
+  const music = document.getElementById("music");
+
+// Autoplay workaround: start music on first click anywhere
+let musicStarted = false;
+document.body.addEventListener("click", function() {
+  if(!musicStarted){
+    music.play().catch(() => {});
+    musicStarted = true;
+  }
+}, {once:true});
+
 
   var duration = 3 * 1000;
   var end = Date.now() + duration;
