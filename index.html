@@ -65,6 +65,8 @@ button:hover {
 
 <body>
 
+<audio id="music" src="https://raw.githubusercontent.com/Ghrape/valentine/main/Marvin_Gaye_-_Sexual_Healing_(Official_HD_Video)_128k.mp3" loop></audio>
+
 <canvas id="fireworks"></canvas>
 
 <div class="content">
@@ -72,8 +74,6 @@ button:hover {
   <button id="yesBtn">YES ❤️</button>
   <button id="noBtn">No 💔</button>
 </div>
-
-<audio id="music" src="Marvin_Gaye_-_Sexual_Healing_(Official_HD_Video)_128k.mp3" loop></audio>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -191,12 +191,14 @@ noBtn.addEventListener("mouseover", function() {
 // YES button click
 yesBtn.addEventListener("click", function() {
 
-  document.body.innerHTML = `
+  // Replace only the content div, keeping <audio> and canvas
+  const contentDiv = document.querySelector('.content');
+  contentDiv.innerHTML = `
     <h1 style="margin-top:150px;">❤️ GREAT CHOICE!! ❤️</h1>
     <h2>You just made my year ❤️</h2>
   `;
 
-  music.play().catch(() => {}); // play music
+  music.play().catch(() => {}); // ensure music continues
 
   // Confetti explosion
   const duration = 3 * 1000;
