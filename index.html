@@ -143,4 +143,48 @@ noBtn.addEventListener("mouseover", function() {
   jumpDistance = jumpDistance * 0.6; // Reduces distance by 40% every jump
   
   // Optional: If distance is very small, stop moving (let them catch it)
-  if (jump
+  if (jumpDistance < 10) {
+      noBtn.style.cursor = "pointer";
+      // We stop adding the event listener logic effectively by doing nothing here
+      jumpDistance = 0;
+  }
+});
+
+yesBtn.addEventListener("click", function() {
+  // Update the page content on success
+  document.body.innerHTML = `
+    <div style="display:flex; justify-content:center; align-items:center; height:100vh; flex-direction:column;">
+        <h1 style="font-size:60px; color:#d63384;">🎆 Good Choice! 🎆</h1>
+        <p style="font-size: 30px; color:#d63384;">Happy Valentine's Day! ❤️</p>
+    </div>
+  `;
+
+  music.play();
+
+  // Confetti explosion
+  var duration = 3 * 1000;
+  var end = Date.now() + duration;
+
+  (function frame() {
+    confetti({
+      particleCount: 6,
+      angle: 60,
+      spread: 70,
+      origin: { x: 0 }
+    });
+    confetti({
+      particleCount: 6,
+      angle: 120,
+      spread: 70,
+      origin: { x: 1 }
+    });
+
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  }());
+});
+</script>
+
+</body>
+</html>
