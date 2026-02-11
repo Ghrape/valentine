@@ -8,9 +8,11 @@ body {
   margin: 0;
   text-align: center;
   font-family: Arial, sans-serif;
-  background: radial-gradient(circle at bottom, #1a0033, #000);
+  /* CHANGED: Background to Lavender */
+  background-color: #E6E6FA; 
   overflow: hidden;
-  color: white;
+  /* CHANGED: Text color to dark purple so it's visible on lavender */
+  color: #4B0082; 
 }
 
 canvas {
@@ -18,6 +20,7 @@ canvas {
   top: 0;
   left: 0;
   z-index: 0;
+  opacity: 0.5; /* Made fireworks slightly transparent so they look nice on lavender */
 }
 
 .content {
@@ -57,7 +60,8 @@ button:hover {
 
 .heart {
   position: absolute;
-  color: pink;
+  /* CHANGED: Darker pink so it shows up on lavender */
+  color: #ff1493; 
   font-size: 20px;
   animation: floatUp 6s linear infinite;
   z-index: 1;
@@ -153,42 +157,7 @@ setInterval(createHeart, 600);
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
 const music = document.getElementById("music");
+const contentDiv = document.querySelector(".content");
 
 noBtn.addEventListener("mouseover", function() {
-  noBtn.style.left = Math.random() * (window.innerWidth - 100) + "px";
-  noBtn.style.top = Math.random() * (window.innerHeight - 50) + "px";
-});
-
-yesBtn.addEventListener("click", function() {
-  document.body.innerHTML = `
-    <h1 style="margin-top:200px;">❤️ GOOD CHOICE! ❤️</h1>
-  `;
-
-  music.play();
-
-  var duration = 3 * 1000;
-  var end = Date.now() + duration;
-
-  (function frame() {
-    confetti({
-      particleCount: 6,
-      angle: 60,
-      spread: 70,
-      origin: { x: 0 }
-    });
-    confetti({
-      particleCount: 6,
-      angle: 120,
-      spread: 70,
-      origin: { x: 1 }
-    });
-
-    if (Date.now() < end) {
-      requestAnimationFrame(frame);
-    }
-  }());
-});
-</script>
-
-</body>
-</html>
+  noBtn.style.left = Math.random() *
