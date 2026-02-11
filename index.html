@@ -21,6 +21,9 @@ body {
 
 /* Container for the initial question */
 #question-screen {
+  display: flex; /* Flex to center content */
+  flex-direction: column;
+  align-items: center;
   position: relative;
   z-index: 2;
   transition: opacity 0.5s;
@@ -28,7 +31,7 @@ body {
 
 /* Container for the success message (hidden by default) */
 #success-screen {
-  display: none;
+  display: none; /* Hidden at start */
   position: relative;
   z-index: 2;
   animation: popIn 0.5s ease-out;
@@ -53,23 +56,24 @@ button {
   border-radius: 12px;
   border: none;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: background 0.2s, transform 0.2s; /* Removed transform transition for No button logic */
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-button:hover {
-  transform: scale(1.1);
+  font-weight: bold;
 }
 
 #yesBtn {
   background: #ff4d6d;
   color: white;
 }
+#yesBtn:hover {
+  transform: scale(1.1);
+}
 
 #noBtn {
   background: #ffffff;
   color: #ff4d6d;
-  position: absolute; 
+  position: fixed; /* FIXED: Allows it to move anywhere on screen */
+  z-index: 3; /* Ensures it stays on top */
 }
 
 /* Floating Hearts */
@@ -94,14 +98,14 @@ button:hover {
 
 <div id="question-screen">
   <h1>Josie, Will You Be My Valentine? ❤️</h1>
-  <div>
+  <div style="width: 100%; height: 100px; display: flex; justify-content: center; align-items: center;">
       <button id="yesBtn">YES ❤️</button>
       <button id="noBtn">No 💔</button>
   </div>
 </div>
 
 <div id="success-screen">
-    <h1 style="font-size:60px;">❤️ Good Choice! ❤️</h1>
+    <h1 style="font-size:60px;">🎆 Good Choice! 🎆</h1>
     <p style="font-size: 30px;">Happy Valentine's Day! ❤️</p>
 </div>
 
@@ -110,7 +114,7 @@ button:hover {
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-// --- Floating Hearts (Runs continuously) ---
+// --- Floating Hearts ---
 function createHeart() {
   const heart = document.createElement("div");
   heart.classList.add("heart");
@@ -122,10 +126,7 @@ function createHeart() {
 
   setTimeout(() => heart.remove(), 6000);
 }
-
-// Creating hearts every 100ms
 setInterval(createHeart, 100);
-
 
 // --- Button Logic ---
 const yesBtn = document.getElementById("yesBtn");
@@ -134,16 +135,33 @@ const questionScreen = document.getElementById("question-screen");
 const successScreen = document.getElementById("success-screen");
 const music = document.getElementById("music");
 
-let jumpDistance = 300; // Initial jump distance
+// Set initial position of No button to be next to Yes button roughly
+// We do this after load to ensure coordinates are right
+window.onload = function() {
+    const yesRect = yesBtn.getBoundingClientRect();
+    noBtn.style.left = (yesRect.right + 20) + "px";
+    noBtn.style.top = yesRect.top + "px";
+};
+
+let moveRange = 300; // How far it can jump max
 
 noBtn.addEventListener("mouseover", function() {
-  // Get current position
-  const currentX = noBtn.offsetLeft;
-  const currentY = noBtn.offsetTop;
+    // Calculate random position within the window
+    // We want it to stay somewhat near, but "run away"
+    
+    // Get viewport dimensions
+    const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+    const maxY = window.innerHeight - noBtn.offsetHeight - 20;
 
-  // Calculate move
-  const moveX = (Math.random() - 0.5) * 2 * jumpDistance;
-  const moveY = (Math.random() - 0.5) * 2 * jumpDistance;
+    // Current Position
+    const currentX = parseFloat(noBtn.style.left) || 0;
+    const currentY = parseFloat(noBtn.style.top) || 0;
 
-  let newX = currentX + moveX;
-  let new
+    // Calculate a new random position based on moveRange
+    // (Math.random() - 0.5) * 2 gives -1 to 1
+    let newX = currentX + ((Math.random() - 0.5) * 2 * moveRange);
+    let newY = currentY + ((Math.random() - 0.5) * 2 * moveRange);
+
+    // Keep it inside the screen
+    if (newX < 20) newX = 20;
+    if (
