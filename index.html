@@ -7,46 +7,27 @@
 body {
   margin: 0;
   text-align: center;
-  font-family: 'Arial', sans-serif;
-  /* Pink background gradient */
-  background: linear-gradient(to bottom, #ffecee, #ffc0cb);
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at bottom, #1a0033, #000);
   overflow: hidden;
-  color: #d63384; 
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  color: white;
 }
 
-/* Container for the initial question */
-#question-screen {
-  display: flex; /* Flex to center content */
-  flex-direction: column;
-  align-items: center;
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.content {
   position: relative;
-  z-index: 2;
-  transition: opacity 0.5s;
-}
-
-/* Container for the success message (hidden by default) */
-#success-screen {
-  display: none; /* Hidden at start */
-  position: relative;
-  z-index: 2;
-  animation: popIn 0.5s ease-out;
-}
-
-@keyframes popIn {
-  0% { transform: scale(0); opacity: 0; }
-  80% { transform: scale(1.1); opacity: 1; }
-  100% { transform: scale(1); }
+  z-index: 1;
 }
 
 h1 {
-  font-size: 50px;
-  margin-bottom: 30px;
-  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+  margin-top: 120px;
+  font-size: 45px;
 }
 
 button {
@@ -56,35 +37,30 @@ button {
   border-radius: 12px;
   border: none;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s; /* Removed transform transition for No button logic */
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  font-weight: bold;
+  transition: transform 0.2s;
 }
 
-#yesBtn {
-  background: #ff4d6d;
-  color: white;
-}
-#yesBtn:hover {
+button:hover {
   transform: scale(1.1);
 }
 
-#noBtn {
-  background: #ffffff;
-  color: #ff4d6d;
-  position: fixed; /* FIXED: Allows it to move anywhere on screen */
-  z-index: 3; /* Ensures it stays on top */
+#yesBtn {
+  background: red;
+  color: white;
 }
 
-/* Floating Hearts */
+#noBtn {
+  background: black;
+  color: white;
+  position: absolute;
+}
+
 .heart {
   position: absolute;
-  color: #ff4d6d;
+  color: pink;
   font-size: 20px;
   animation: floatUp 6s linear infinite;
   z-index: 1;
-  opacity: 0.8;
-  pointer-events: none; /* Let clicks pass through hearts */
 }
 
 @keyframes floatUp {
@@ -96,17 +72,12 @@ button {
 
 <body>
 
-<div id="question-screen">
-  <h1>Josie, Will You Be My Valentine? ❤️</h1>
-  <div style="width: 100%; height: 100px; display: flex; justify-content: center; align-items: center;">
-      <button id="yesBtn">YES ❤️</button>
-      <button id="noBtn">No 💔</button>
-  </div>
-</div>
+<canvas id="fireworks"></canvas>
 
-<div id="success-screen">
-    <h1 style="font-size:60px;">❤️ Good Choice! ❤️</h1>
-    <p style="font-size: 30px;">Happy Valentine's Day! ❤️</p>
+<div class="content">
+  <h1>Josie, Will You Be My Valentine? ❤️</h1>
+  <button id="yesBtn">YES ❤️</button>
+  <button id="noBtn">No 💔</button>
 </div>
 
 <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"></audio>
@@ -114,7 +85,56 @@ button {
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-// --- Floating Hearts ---
+// Fireworks background
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+
+function createFirework() {
+  const x = Math.random() * canvas.width;
+  const y = Math.random() * canvas.height / 2;
+  const color = `hsl(${Math.random()*360}, 100%, 60%)`;
+
+  for (let i = 0; i < 50; i++) {
+    particles.push({
+      x: x,
+      y: y,
+      radius: 2,
+      color: color,
+      speedX: (Math.random() - 0.5) * 6,
+      speedY: (Math.random() - 0.5) * 6,
+      life: 100
+    });
+  }
+}
+
+function updateFireworks() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach((p, index) => {
+    p.x += p.speedX;
+    p.y += p.speedY;
+    p.life--;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+
+    if (p.life <= 0) particles.splice(index, 1);
+  });
+
+  requestAnimationFrame(updateFireworks);
+}
+
+setInterval(createFirework, 800);
+updateFireworks();
+
+// Floating hearts
 function createHeart() {
   const heart = document.createElement("div");
   heart.classList.add("heart");
@@ -126,42 +146,49 @@ function createHeart() {
 
   setTimeout(() => heart.remove(), 6000);
 }
-setInterval(createHeart, 100);
 
-// --- Button Logic ---
+setInterval(createHeart, 600);
+
+// Buttons
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
-const questionScreen = document.getElementById("question-screen");
-const successScreen = document.getElementById("success-screen");
 const music = document.getElementById("music");
 
-// Set initial position of No button to be next to Yes button roughly
-// We do this after load to ensure coordinates are right
-window.onload = function() {
-    const yesRect = yesBtn.getBoundingClientRect();
-    noBtn.style.left = (yesRect.right + 20) + "px";
-    noBtn.style.top = yesRect.top + "px";
-};
-
-let moveRange = 300; // How far it can jump max
-
 noBtn.addEventListener("mouseover", function() {
-    // Calculate random position within the window
-    // We want it to stay somewhat near, but "run away"
-    
-    // Get viewport dimensions
-    const maxX = window.innerWidth - noBtn.offsetWidth - 20;
-    const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+  noBtn.style.left = Math.random() * (window.innerWidth - 100) + "px";
+  noBtn.style.top = Math.random() * (window.innerHeight - 50) + "px";
+});
 
-    // Current Position
-    const currentX = parseFloat(noBtn.style.left) || 0;
-    const currentY = parseFloat(noBtn.style.top) || 0;
+yesBtn.addEventListener("click", function() {
+  document.body.innerHTML = `
+    <h1 style="margin-top:200px;">❤️ GOOD CHOICE! ❤️</h1>
+  `;
 
-    // Calculate a new random position based on moveRange
-    // (Math.random() - 0.5) * 2 gives -1 to 1
-    let newX = currentX + ((Math.random() - 0.5) * 2 * moveRange);
-    let newY = currentY + ((Math.random() - 0.5) * 2 * moveRange);
+  music.play();
 
-    // Keep it inside the screen
-    if (newX < 20) newX = 20;
-    if (
+  var duration = 3 * 1000;
+  var end = Date.now() + duration;
+
+  (function frame() {
+    confetti({
+      particleCount: 6,
+      angle: 60,
+      spread: 70,
+      origin: { x: 0 }
+    });
+    confetti({
+      particleCount: 6,
+      angle: 120,
+      spread: 70,
+      origin: { x: 1 }
+    });
+
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  }());
+});
+</script>
+
+</body>
+</html>
