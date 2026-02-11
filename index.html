@@ -8,31 +8,42 @@ body {
   margin: 0;
   text-align: center;
   font-family: 'Arial', sans-serif;
-  /* CHANGED: Background is now a pink gradient */
+  /* Pink background gradient */
   background: linear-gradient(to bottom, #ffecee, #ffc0cb);
   overflow: hidden;
-  /* CHANGED: Text color is now dark red to be visible on pink */
   color: #d63384; 
-}
-
-.content {
-  position: relative;
-  z-index: 2; /* Increased z-index so it sits above hearts */
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  height: 100vh; /* Center content vertically */
+  align-items: center;
+}
+
+/* Container for the initial question */
+#question-screen {
+  position: relative;
+  z-index: 2;
+  transition: opacity 0.5s;
+}
+
+/* Container for the success message (hidden by default) */
+#success-screen {
+  display: none;
+  position: relative;
+  z-index: 2;
+  animation: popIn 0.5s ease-out;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  80% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); }
 }
 
 h1 {
   font-size: 50px;
   margin-bottom: 30px;
   text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
-}
-
-.btn-container {
-    position: relative;
 }
 
 button {
@@ -58,16 +69,18 @@ button:hover {
 #noBtn {
   background: #ffffff;
   color: #ff4d6d;
-  position: absolute; /* Essential for moving it around */
+  position: absolute; 
 }
 
+/* Floating Hearts */
 .heart {
   position: absolute;
-  color: #ff4d6d; /* Darker pink for hearts */
+  color: #ff4d6d;
   font-size: 20px;
   animation: floatUp 6s linear infinite;
   z-index: 1;
   opacity: 0.8;
+  pointer-events: none; /* Let clicks pass through hearts */
 }
 
 @keyframes floatUp {
@@ -79,13 +92,17 @@ button:hover {
 
 <body>
 
-<div class="content">
+<div id="question-screen">
   <h1>Josie, Will You Be My Valentine? ❤️</h1>
-  
-  <div class="btn-container">
+  <div>
       <button id="yesBtn">YES ❤️</button>
       <button id="noBtn">No 💔</button>
   </div>
+</div>
+
+<div id="success-screen">
+    <h1 style="font-size:60px;">❤️ Good Choice! ❤️</h1>
+    <p style="font-size: 30px;">Happy Valentine's Day! ❤️</p>
 </div>
 
 <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"></audio>
@@ -93,7 +110,7 @@ button:hover {
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-// --- CHANGED: Floating hearts (Increased amount) ---
+// --- Floating Hearts (Runs continuously) ---
 function createHeart() {
   const heart = document.createElement("div");
   heart.classList.add("heart");
@@ -106,85 +123,27 @@ function createHeart() {
   setTimeout(() => heart.remove(), 6000);
 }
 
-// CHANGED: Interval set to 100ms (was 600ms) to create many more hearts
+// Creating hearts every 100ms
 setInterval(createHeart, 100);
 
 
 // --- Button Logic ---
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
+const questionScreen = document.getElementById("question-screen");
+const successScreen = document.getElementById("success-screen");
 const music = document.getElementById("music");
 
-// CHANGED: Logic for the "No" button to jump less distance each time
-let jumpDistance = 300; // Starting 'jump' range in pixels
+let jumpDistance = 300; // Initial jump distance
 
 noBtn.addEventListener("mouseover", function() {
-  // Get current position (or set initial if not set)
+  // Get current position
   const currentX = noBtn.offsetLeft;
   const currentY = noBtn.offsetTop;
 
-  // Calculate a random move based on the current jumpDistance
-  // (Math.random() - 0.5) * 2 gives a number between -1 and 1
+  // Calculate move
   const moveX = (Math.random() - 0.5) * 2 * jumpDistance;
   const moveY = (Math.random() - 0.5) * 2 * jumpDistance;
 
   let newX = currentX + moveX;
-  let newY = currentY + moveY;
-
-  // Boundary checks to keep the button on screen
-  if (newX < 0) newX = 20;
-  if (newX > window.innerWidth - 100) newX = window.innerWidth - 120;
-  if (newY < -200) newY = -100; // Adjust for container context
-  if (newY > 200) newY = 200;
-
-  noBtn.style.transform = `translate(${newX}px, ${newY}px)`; // Use transform for smoother movement relative to start
-
-  // CHANGED: Decrease the jump distance for the next time (decay)
-  jumpDistance = jumpDistance * 0.6; // Reduces distance by 40% every jump
-  
-  // Optional: If distance is very small, stop moving (let them catch it)
-  if (jumpDistance < 10) {
-      noBtn.style.cursor = "pointer";
-      // We stop adding the event listener logic effectively by doing nothing here
-      jumpDistance = 0;
-  }
-});
-
-yesBtn.addEventListener("click", function() {
-  // Update the page content on success
-  document.body.innerHTML = `
-    <div style="display:flex; justify-content:center; align-items:center; height:100vh; flex-direction:column;">
-        <h1 style="font-size:60px; color:#d63384;">🎆 Good Choice! 🎆</h1>
-        <p style="font-size: 30px; color:#d63384;">Happy Valentine's Day! ❤️</p>
-    </div>
-  `;
-
-  music.play();
-
-  // Confetti explosion
-  var duration = 3 * 1000;
-  var end = Date.now() + duration;
-
-  (function frame() {
-    confetti({
-      particleCount: 6,
-      angle: 60,
-      spread: 70,
-      origin: { x: 0 }
-    });
-    confetti({
-      particleCount: 6,
-      angle: 120,
-      spread: 70,
-      origin: { x: 1 }
-    });
-
-    if (Date.now() < end) {
-      requestAnimationFrame(frame);
-    }
-  }());
-});
-</script>
-
-</body>
-</html>
+  let new
