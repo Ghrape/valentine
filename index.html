@@ -68,6 +68,21 @@ button:hover {
   pointer-events: none;
   z-index: 0;
 }
+  /* ---------- SPINNING PHOTO STYLE ---------- */
+.popup-photo {
+  position: fixed;
+  width: 180px;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(255,255,255,0.8);
+  animation: spinPop 4s ease-out forwards;
+  z-index: 5;
+}
+
+@keyframes spinPop {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  20% { transform: scale(1.1) rotate(180deg); opacity: 1; }
+  100% { transform: scale(1) rotate(720deg); opacity: 0; }
+}
 </style>
 </head>
 
@@ -192,9 +207,14 @@ document.body.addEventListener("click", function() {
 
 // No button runs away
 noBtn.addEventListener("mouseover", function() {
-  noBtn.style.left = Math.random() * (window.innerWidth - 100) + "px";
+  noBtn.style.left = Math.random() * (window.innerWidth - 50) + "px";
   noBtn.style.top = Math.random() * (window.innerHeight - 50) + "px";
 });
+  // ----------- PHOTO POPUP FUNCTION -----------
+const photos = [
+  "https://github.com/Ghrape/valentine/blob/main/HEIF%20Image%20(1).jpeg",
+  "https://github.com/Ghrape/valentine/blob/main/HEIF%20Image.jpeg",
+];
 
 // YES button click
 yesBtn.addEventListener("click", function() {
