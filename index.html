@@ -206,14 +206,16 @@ document.body.addEventListener("click", function() {
   }
 }, {once:true});
 
-// No button runs away (small jumps)
+// No button runs away (slightly bigger jumps, stays on screen)
 noBtn.addEventListener("mouseover", function(e) {
+  const moveDistance = 200; // bigger jump distance
 
-  const moveDistance = 120; // smaller jump distance
+  // Current position
   const rect = noBtn.getBoundingClientRect();
   let newLeft = rect.left + (Math.random() - 0.5) * moveDistance;
   let newTop = rect.top + (Math.random() - 0.5) * moveDistance;
 
+  // Keep button inside screen
   newLeft = Math.max(0, Math.min(window.innerWidth - rect.width, newLeft));
   newTop = Math.max(0, Math.min(window.innerHeight - rect.height, newTop));
 
@@ -221,7 +223,7 @@ noBtn.addEventListener("mouseover", function(e) {
   noBtn.style.left = newLeft + "px";
   noBtn.style.top = newTop + "px";
 });
-
+  
 // ----------- PHOTO POPUP FUNCTION -----------
 const photos = [
   "https://raw.githubusercontent.com/Ghrape/valentine/main/HEIF%20Image%20(1).jpeg",
