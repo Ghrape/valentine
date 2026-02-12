@@ -60,10 +60,7 @@ button:hover {
 #noBtn {
   background: black;
   color: white;
-  position: fixed;   /* fixed from the start */
-  left: 50%;         /* initial horizontal position */
-  top: 50%;          /* initial vertical position */
-  transform: translateX(-50%); /* center horizontally */
+  position: relative;  /* normal flow initially */
 }
 
 .heart {
@@ -211,21 +208,28 @@ document.body.addEventListener("click", function() {
 
 // No button runs away (slightly bigger jumps, stays on screen)
 noBtn.addEventListener("mouseover", function(e) {
-  const moveDistance = 200; // bigger jump distance
+  const moveDistance = 200; // bigger jump
+
+  // If first time hovering, switch to fixed and set current position
+  if (noBtn.style.position !== "fixed") {
+    const rect = noBtn.getBoundingClientRect();
+    noBtn.style.position = "fixed";
+    noBtn.style.left = rect.left + "px";
+    noBtn.style.top = rect.top + "px";
+  }
 
   // Current position
   const rect = noBtn.getBoundingClientRect();
   let newLeft = rect.left + (Math.random() - 0.5) * moveDistance;
   let newTop = rect.top + (Math.random() - 0.5) * moveDistance;
 
-  // Keep button inside screen
+  // Keep inside viewport
   newLeft = Math.max(0, Math.min(window.innerWidth - rect.width, newLeft));
   newTop = Math.max(0, Math.min(window.innerHeight - rect.height, newTop));
 
   noBtn.style.left = newLeft + "px";
   noBtn.style.top = newTop + "px";
 });
-
   
 // ----------- PHOTO POPUP FUNCTION -----------
 const photos = [
