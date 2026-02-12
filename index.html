@@ -1,200 +1,236 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Be My Valentine?</title>
+<title>Will You Be My Valentine?</title>
 
 <style>
 body {
   margin: 0;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
   text-align: center;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at bottom, #B98AF2, #000);
+  overflow: hidden;
   color: white;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(to bottom, #ff4e50, #ff6f91);
 }
 
-/* Center content */
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
 .content {
   position: relative;
-  z-index: 10;
+  z-index: 1;
+  width: 100%;
+  height: 100vh;            /* fill viewport */
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: center;   /* vertical centering */
+  align-items: center;       /* horizontal centering */
+  text-align: center;
 }
 
 h1 {
-  font-size: 3.5em;
-  margin-bottom: 60px;
+  font-size: 65px;           /* larger text */
+  margin: 0 20px 60px;       /* space below for buttons */
 }
 
 button {
-  padding: 15px 40px;
-  font-size: 1.5em;
-  border: none;
+  padding: 20px 50px;        /* bigger buttons */
+  font-size: 26px;           /* bigger text */
   border-radius: 12px;
+  border: none;
   cursor: pointer;
-  margin: 20px 0;
-  transition: 0.3s;
-}
-
-#yesBtn {
-  background-color: #ff1744;
-  color: white;
-}
-
-#noBtn {
-  background-color: white;
-  color: #ff1744;
+  transition: transform 0.2s;
+  display: block;            /* force buttons to stack vertically */
 }
 
 button:hover {
   transform: scale(1.1);
 }
 
-/* Floating hearts */
+#yesBtn {
+  background: red;
+  color: white;
+  margin-bottom: 40px;       /* space between YES and NO */
+}
+
+#noBtn {
+  background: black;
+  color: white;
+  position: relative;        /* allow NO to stay under YES */
+}
+
 .heart {
   position: absolute;
-  color: pink;
-  font-size: 20px;
-  animation: floatUp linear infinite;
-}
-
-@keyframes floatUp {
-  from { transform: translateY(100vh); }
-  to { transform: translateY(-10vh); }
-}
-
-/* Spinning photo popups */
-.popup-photo {
-  position: absolute;
-  width: 180px;
-  border-radius: 20px;
-  box-shadow: 0 0 25px rgba(255,255,255,0.7);
-  animation: popSpin 2s ease-out forwards;
-  z-index: 5;
-}
-
-@keyframes popSpin {
-  0% { transform: scale(0) rotate(0deg); opacity: 0; }
-  50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
-  100% { transform: scale(1) rotate(360deg); opacity: 1; }
+  pointer-events: none;
+  z-index: 0;
 }
 </style>
 </head>
 
 <body>
 
+<audio id="music" src="https://raw.githubusercontent.com/Ghrape/valentine/main/Marvin_Gaye_-_Sexual_Healing_(Official_HD_Video)_128k.mp3" loop></audio>
+
+<canvas id="fireworks"></canvas>
+
 <div class="content">
-  <h1>Joise, will you be my Valentine? ❤️</h1>
-  <button id="yesBtn">YES 💖</button>
-  <button id="noBtn">NO 😢</button>
+  <h1>Josie, will you be my valentine? ❤️</h1>
+  <button id="yesBtn">YES ❤️</button>
+  <button id="noBtn">No 💔</button>
 </div>
 
-<audio id="bgMusic" loop>
-  <source src="your-song.mp3" type="audio/mpeg">
-</audio>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-const yesBtn = document.getElementById("yesBtn");
-const noBtn = document.getElementById("noBtn");
-const music = document.getElementById("bgMusic");
+// ---------------- FIREWORKS BACKGROUND ----------------
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
 
-/* Floating hearts background */
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+
+function createFirework() {
+  const x = Math.random() * canvas.width;
+  const y = Math.random() * canvas.height / 2;
+  const color = `hsl(${Math.random()*360}, 100%, 60%)`;
+
+  for (let i = 0; i < 50; i++) {
+    particles.push({
+      x: x,
+      y: y,
+      radius: 2,
+      color: color,
+      speedX: (Math.random() - 0.5) * 6,
+      speedY: (Math.random() - 0.5) * 6,
+      life: 100
+    });
+  }
+}
+
+function updateFireworks() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach((p, index) => {
+    p.x += p.speedX;
+    p.y += p.speedY;
+    p.life--;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+
+    if (p.life <= 0) particles.splice(index, 1);
+  });
+
+  requestAnimationFrame(updateFireworks);
+}
+
+setInterval(createFirework, 800);
+updateFireworks();
+
+// ---------------- WAVY FLOATING HEARTS ----------------
 function createHeart() {
   const heart = document.createElement("div");
   heart.classList.add("heart");
-  heart.innerHTML = "❤️";
-  heart.style.left = Math.random() * 100 + "vw";
-  heart.style.animationDuration = (3 + Math.random() * 5) + "s";
-  heart.style.fontSize = (15 + Math.random() * 25) + "px";
+
+  const heartTypes = ["💖","❤️","💘","💝","💕"];
+  heart.innerHTML = heartTypes[Math.floor(Math.random()*heartTypes.length)];
+
+  heart.style.left = Math.random() * window.innerWidth + "px";
+  heart.style.fontSize = (Math.random() * 30 + 20) + "px";
+  heart.style.color = ["#ff4f81","#ff9ecf","#ffe6f0","#ffccd5"][Math.floor(Math.random()*4)];
+  heart.style.opacity = Math.random() * 0.8 + 0.2;
+  heart.style.position = "absolute";
+  heart.style.zIndex = 0;
+  heart.style.pointerEvents = "none";
+
   document.body.appendChild(heart);
 
-  setTimeout(() => heart.remove(), 8000);
+  let posY = window.innerHeight + 50;
+  let amplitude = Math.random() * 50 + 20;
+  let frequency = Math.random() * 0.02 + 0.01;
+  let startX = parseFloat(heart.style.left);
+
+  function float() {
+    posY -= 1;
+    let offsetX = Math.sin(posY * frequency) * amplitude;
+    heart.style.top = posY + "px";
+    heart.style.left = startX + offsetX + "px";
+
+    if (posY > -50) {
+      requestAnimationFrame(float);
+    } else {
+      heart.remove();
+    }
+  }
+
+  float();
 }
+
 setInterval(createHeart, 300);
 
-/* Show spinning photos */
-function showPhotos() {
-  const photos = [
-    "https://github.com/Ghrape/valentine/blob/main/HEIF%20Image%20(1).jpeg",
-    "https://github.com/Ghrape/valentine/blob/main/HEIF%20Image%20.jpeg",
-  ];
+// ---------------- BUTTONS AND MUSIC ----------------
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const music = document.getElementById("music");
 
-  photos.forEach((src, index) => {
-    setTimeout(() => {
-      const img = document.createElement("img");
-      img.src = src;
-      img.classList.add("popup-photo");
+// Autoplay workaround: music starts on first click anywhere
+let musicStarted = false;
+document.body.addEventListener("click", function() {
+  if (!musicStarted) {
+    music.play().catch(() => {});
+    musicStarted = true;
+  }
+}, {once:true});
 
-      img.style.top = Math.random() * (window.innerHeight - 200) + "px";
-      img.style.left = Math.random() * (window.innerWidth - 200) + "px";
+// No button runs away
+noBtn.addEventListener("mouseover", function() {
+  noBtn.style.left = Math.random() * (window.innerWidth - 100) + "px";
+  noBtn.style.top = Math.random() * (window.innerHeight - 50) + "px";
+});
 
-      document.body.appendChild(img);
-    }, index * 500);
-  });
-}
+// YES button click
+yesBtn.addEventListener("click", function() {
 
-/* Confetti */
-function createConfetti() {
-  const confetti = document.createElement("div");
-  confetti.style.position = "absolute";
-  confetti.style.width = "10px";
-  confetti.style.height = "10px";
-  confetti.style.backgroundColor =
-    ["#ff0", "#0ff", "#f0f", "#fff", "#ff1744"][
-      Math.floor(Math.random() * 5)
-    ];
-  confetti.style.left = Math.random() * 100 + "vw";
-  confetti.style.top = "-10px";
-  confetti.style.opacity = 0.8;
-  confetti.style.borderRadius = "50%";
-  confetti.style.zIndex = 5;
-
-  document.body.appendChild(confetti);
-
-  let fall = setInterval(() => {
-    confetti.style.top =
-      parseInt(confetti.style.top) + 5 + "px";
-  }, 20);
-
-  setTimeout(() => {
-    clearInterval(fall);
-    confetti.remove();
-  }, 3000);
-}
-
-/* YES CLICK */
-yesBtn.addEventListener("click", function () {
-
-  music.play().catch(() => {});
-
-  document.querySelector(".content").innerHTML = `
-    <h1 style="margin-bottom:40px;">❤️ Great Choice!! ❤️</h1>
-    <h2>I can't wait for our Valentine’s date 💕</h2>
+  // Replace only the content div, keeping <audio> and canvas
+  const contentDiv = document.querySelector('.content');
+  contentDiv.innerHTML = `
+    <h1 style="margin-bottom: 50px;">❤️ GREAT CHOICE!! ❤️</h1>
+    <h2>You just made my year ❤️</h2>
   `;
 
-  showPhotos();
+  music.play().catch(() => {}); // ensure music continues
 
-  for (let i = 0; i < 100; i++) {
-    setTimeout(createConfetti, i * 50);
-  }
-});
+  // Confetti explosion
+  const duration = 3 * 1000;
+  const end = Date.now() + duration;
 
-/* NO BUTTON RUNS AWAY (desktop only) */
-noBtn.addEventListener("mouseover", function () {
-  noBtn.style.position = "absolute";
-  noBtn.style.top = Math.random() * 80 + "vh";
-  noBtn.style.left = Math.random() * 80 + "vw";
-});
+  (function frame() {
+    confetti({
+      particleCount: 6,
+      angle: 60,
+      spread: 70,
+      origin: { x: 0 }
+    });
+    confetti({
+      particleCount: 6,
+      angle: 120,
+      spread: 70,
+      origin: { x: 1 }
+    });
 
-/* On mobile, make NO shrink instead */
-noBtn.addEventListener("click", function () {
-  noBtn.style.transform = "scale(0.5)";
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  }());
+
 });
 </script>
 
