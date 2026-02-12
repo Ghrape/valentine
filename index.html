@@ -60,7 +60,10 @@ button:hover {
 #noBtn {
   background: black;
   color: white;
-  position: relative;
+  position: fixed;   /* fixed from the start */
+  left: 50%;         /* initial horizontal position */
+  top: 50%;          /* initial vertical position */
+  transform: translateX(-50%); /* center horizontally */
 }
 
 .heart {
@@ -219,10 +222,10 @@ noBtn.addEventListener("mouseover", function(e) {
   newLeft = Math.max(0, Math.min(window.innerWidth - rect.width, newLeft));
   newTop = Math.max(0, Math.min(window.innerHeight - rect.height, newTop));
 
-  noBtn.style.position = "fixed";
   noBtn.style.left = newLeft + "px";
   noBtn.style.top = newTop + "px";
 });
+
   
 // ----------- PHOTO POPUP FUNCTION -----------
 const photos = [
