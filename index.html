@@ -206,14 +206,28 @@ document.body.addEventListener("click", function() {
 }, {once:true});
 
 // No button runs away
-noBtn.addEventListener("mouseover", function() {
-  noBtn.style.left = Math.random() * (window.innerWidth - 50) + "px";
-  noBtn.style.top = Math.random() * (window.innerHeight - 50) + "px";
+noBtn.addEventListener("mouseover", function(e) {
+
+  const moveDistance = 120; // smaller jump distance
+
+  // Current position
+  const rect = noBtn.getBoundingClientRect();
+  let newLeft = rect.left + (Math.random() - 0.5) * moveDistance;
+  let newTop = rect.top + (Math.random() - 0.5) * moveDistance;
+
+  // Keep button inside screen
+  newLeft = Math.max(0, Math.min(window.innerWidth - rect.width, newLeft));
+  newTop = Math.max(0, Math.min(window.innerHeight - rect.height, newTop));
+
+  noBtn.style.position = "fixed";
+  noBtn.style.left = newLeft + "px";
+  noBtn.style.top = newTop + "px";
 });
+
   // ----------- PHOTO POPUP FUNCTION -----------
 const photos = [
-  "https://github.com/Ghrape/valentine/blob/main/HEIF%20Image%20(1).jpeg",
-  "https://github.com/Ghrape/valentine/blob/main/HEIF%20Image.jpeg",
+  "https://raw.githubusercontent.com/Ghrape/valentine/main/HEIF%20Image%20(1).jpeg",
+  "https://raw.githubusercontent.com/Ghrape/valentine/main/HEIF%20Image.jpeg",
 ];
 
 // YES button click
