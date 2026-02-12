@@ -24,27 +24,27 @@ canvas {
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 100vh;            /* fill viewport */
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;   /* vertical centering */
-  align-items: center;       /* horizontal centering */
+  justify-content: center;
+  align-items: center;
   text-align: center;
 }
 
 h1 {
-  font-size: 65px;           /* larger text */
-  margin: 0 20px 60px;       /* space below for buttons */
+  font-size: 65px;
+  margin: 0 20px 60px;
 }
 
 button {
-  padding: 20px 50px;        /* bigger buttons */
-  font-size: 26px;           /* bigger text */
+  padding: 20px 50px;
+  font-size: 26px;
   border-radius: 12px;
   border: none;
   cursor: pointer;
   transition: transform 0.2s;
-  display: block;            /* force buttons to stack vertically */
+  display: block;
 }
 
 button:hover {
@@ -54,13 +54,13 @@ button:hover {
 #yesBtn {
   background: red;
   color: white;
-  margin-bottom: 40px;       /* space between YES and NO */
+  margin-bottom: 40px;
 }
 
 #noBtn {
   background: black;
   color: white;
-  position: relative;        /* allow NO to stay under YES */
+  position: relative;
 }
 
 .heart {
@@ -68,7 +68,8 @@ button:hover {
   pointer-events: none;
   z-index: 0;
 }
-  /* ---------- SPINNING PHOTO STYLE ---------- */
+
+/* ---------- SPINNING PHOTO STYLE ---------- */
 .popup-photo {
   position: fixed;
   width: 180px;
@@ -205,17 +206,14 @@ document.body.addEventListener("click", function() {
   }
 }, {once:true});
 
-// No button runs away
+// No button runs away (small jumps)
 noBtn.addEventListener("mouseover", function(e) {
 
   const moveDistance = 120; // smaller jump distance
-
-  // Current position
   const rect = noBtn.getBoundingClientRect();
   let newLeft = rect.left + (Math.random() - 0.5) * moveDistance;
   let newTop = rect.top + (Math.random() - 0.5) * moveDistance;
 
-  // Keep button inside screen
   newLeft = Math.max(0, Math.min(window.innerWidth - rect.width, newLeft));
   newTop = Math.max(0, Math.min(window.innerHeight - rect.height, newTop));
 
@@ -224,11 +222,26 @@ noBtn.addEventListener("mouseover", function(e) {
   noBtn.style.top = newTop + "px";
 });
 
-  // ----------- PHOTO POPUP FUNCTION -----------
+// ----------- PHOTO POPUP FUNCTION -----------
 const photos = [
   "https://raw.githubusercontent.com/Ghrape/valentine/main/HEIF%20Image%20(1).jpeg",
   "https://raw.githubusercontent.com/Ghrape/valentine/main/HEIF%20Image.jpeg",
 ];
+
+function createPhoto() {
+  const img = document.createElement("img");
+  img.src = photos[Math.floor(Math.random() * photos.length)];
+  img.className = "popup-photo";
+
+  img.style.top = Math.random() * 70 + "%";
+  img.style.left = Math.random() * 70 + "%";
+
+  document.body.appendChild(img);
+
+  setTimeout(() => {
+    img.remove();
+  }, 4000);
+}
 
 // YES button click
 yesBtn.addEventListener("click", function() {
@@ -264,6 +277,14 @@ yesBtn.addEventListener("click", function() {
       requestAnimationFrame(frame);
     }
   }());
+
+  // Start spinning photos
+  const photoInterval = setInterval(createPhoto, 500);
+
+  // Optional: stop after 5 seconds
+  setTimeout(() => {
+    clearInterval(photoInterval);
+  }, 5000);
 
 });
 </script>
